@@ -1,5 +1,22 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'; import html2canvas from 'html2canvas';
 
+// ─── FLAG SVG COMPONENT ───────────────────────────────────────────────────────
+interface FlagProps { code: string; size?: number; }
+const Flag: React.FC<FlagProps> = ({ code, size = 16 }) => {
+  const flags: Record<string, string> = {
+    USD: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#B22234"/><g fill="#FFFFFF"><rect y="46.15" width="900" height="46.15"/><rect y="138.46" width="900" height="46.15"/><rect y="230.77" width="900" height="46.15"/><rect y="323.08" width="900" height="46.15"/><rect y="415.38" width="900" height="46.15"/></g><rect width="360" height="323.08" fill="#3C3B6B"/></svg>',
+    EUR: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#00209F"/><rect y="200" width="900" height="200" fill="#FFFFFF"/><rect y="200" width="900" height="200" fill="#FFD700" opacity="0.3"/></svg>',
+    BRL: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#009B3A"/><polygon points="450,200 700,300 450,400 200,300" fill="#FFCC00"/><rect x="200" y="250" width="500" height="100" fill="#002776"/></svg>',
+    COP: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="200" fill="#FFCD00"/><rect y="200" width="900" height="200" fill="#0052CC"/><rect y="400" width="900" height="200" fill="#FF0000"/></svg>',
+    PEN: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="600" fill="#CE1126"/><rect x="300" width="300" height="600" fill="#FFFFFF"/><rect x="600" width="300" height="600" fill="#CE1126"/></svg>',
+    ARS: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="200" fill="#74B9FF"/><rect y="200" width="900" height="200" fill="#FFFFFF"/><rect y="400" width="900" height="200" fill="#EF3B39"/><circle cx="450" cy="300" r="50" fill="#FFD700"/></svg>',
+  };
+  const svg = flags[code] || '';
+  return (
+    <svg width={size} height={size} viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" dangerouslySetInnerHTML={{ __html: svg }} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: 4 }} />
+  );
+};
+
 // ─── HELPER: DESCARGAR PRESUPUESTO COMO IMAGEN ───────────────────────────────
 const descargarPresupuesto = async (clientName: string) => {
   const element = document.getElementById('budget-document');
@@ -79,7 +96,7 @@ const fmtFx = (clp: number, key: string) => {
   const r = RATES[key];
   const val = clp * r.rate;
   const decimals = val < 10 ? 2 : val < 1000 ? 0 : 0;
-  return `${r.flag} ${val.toLocaleString('es-AR', { maximumFractionDigits: decimals })} ${r.code}`;
+  return `${val.toLocaleString('es-AR', { maximumFractionDigits: decimals })} ${r.code}`;
 };
 
 // ─── CATALOG ──────────────────────────────────────────────────────────────────
@@ -353,7 +370,7 @@ const CurrencyRow: React.FC<{ totalCLP: number }> = ({ totalCLP }) => (
             whiteSpace: 'nowrap',
           }}
         >
-          {fmtFx(totalCLP, key)}
+          <Flag code={key} size={14} /> {fmtFx(totalCLP, key)}
         </div>
       ))}
     </div>
@@ -950,8 +967,8 @@ NAWEMEDIA — Producción y Diseño Audiovisual`;
 
   return (
     <div className="fade-in" style={{ paddingBottom: 40 }}>
-      {/* DocBody siempre en el DOM pero oculto cuando step !== 'read' */}
-      <div style={{ display: step === 'read' ? 'block' : 'none' }}>
+      {/* DocBody siempre en el DOM pero oculto cuando step !== 'read' - visibility:hidden permite html2canvas capturarlo */}
+      <div style={{ visibility: step === 'read' ? 'visible' : 'hidden', height: step === 'read' ? 'auto' : 0, overflow: 'hidden' }}>
         <DocBody state={state} />
         <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px 20px' }}>
           <button onClick={() => setStep('sign')} style={{ ...btnPrim({ width: '100%', padding: '15px', fontSize: 14 }) }}>
@@ -1034,7 +1051,7 @@ const SignedView: React.FC<SignedViewProps> = ({ state, signed }) => {
   return (
     <div className="fade-in" style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 60px' }}>
       {/* DocBody oculto para descargar */}
-      <div style={{ display: 'none' }}>
+      <div style={{ visibility: 'hidden', height: 0, overflow: 'hidden' }}>
         <DocBody state={state} />
       </div>
       <div style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 20, padding: '20px', marginBottom: 20, textAlign: 'center' }}>
