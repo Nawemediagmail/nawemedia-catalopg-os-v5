@@ -1,4 +1,48 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react'; import html2canvas from 'html2canvas';
+
+// ─── HELPER: DESCARGAR PRESUPUESTO COMO IMAGEN ───────────────────────────────
+const descargarPresupuesto = async (clientName: string) => {
+  const element = document.getElementById('budget-document');
+  if (!element) {
+    alert('Error: no se encontró el documento');
+    return;
+  }
+  try {
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#080810',
+      scale: 2,
+      useCORS: true,
+      logging: false,
+    });
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = `Presupuesto-NAWEMEDIA-${clientName || 'Sin-nombre'}-${new Date().toISOString().split('T')[0]}.png`;
+    link.click();
+  } catch (error) {
+    console.error('Error descargando presupuesto:', error);
+    alert('Error al descargar. Intenta nuevamente.');
+  }
+};
+
+// ─── HELPER: GENERAR LINK DE WHATSAPP ────────────────────────────────────────
+const generarWhatsAppLink = (state: { items: Array<{ precio: number; qty?: number }>; descuento: { valor: number }; cliente: { nombre: string } }) => {
+  const subtotal = state.items.reduce((s, i) => s + i.precio * (i.qty || 1), 0);
+  const discountAmount = state.descuento.valor > 0 ? subtotal * (state.descuento.valor / 100) : 0;
+  const total = subtotal - discountAmount;
+  const mensaje = `Hola NAWEMEDIA 👋\n\nAcabo de generar mi presupuesto:\n\nCliente: ${state.cliente.nombre}\nServicios: ${state.items.length} ítems\nTotal: CLP$${total.toLocaleString('es-AR')}\n\nQuiero que hablemos sobre esto. ¿Disponible?`;
+  const numeroWhatsApp = '56959985061';
+  return `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+};
+
+// ─── HELPER: ABRIR MERCADO PAGO ──────────────────────────────────────────────
+const abrirPagoMercadoPago = (state: { items: Array<{ precio: number; qty?: number }>; descuento: { valor: number }; cliente: { nombre: string } }) => {
+  const subtotal = state.items.reduce((s, i) => s + i.precio * (i.qty || 1), 0);
+  const discountAmount = state.descuento.valor > 0 ? subtotal * (state.descuento.valor / 100) : 0;
+  const total = subtotal - discountAmount;
+  const adelanto = Math.round(total * 0.5);
+  alert(`Adelanto requerido: CLP$${adelanto.toLocaleString('es-AR')}\n\nTe enviaremos por WhatsApp los datos de la cuenta.`);
+  window.open(generarWhatsAppLink(state), '_blank');
+};
 
 // ─── DESIGN TOKENS ───────────────────────────────────────────────────────────
 const C = {
@@ -708,8 +752,9 @@ const DocBody: React.FC<DocBodyProps> = ({ state }) => {
   const total = subtotal - discountAmount;
 
   return (
-    <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px' }}>
-      {/* Header */}
+    <div id="budget-document" style={{ background: C.bg }}>
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px' }}>
+        {/* Header */}
       <div style={{ textAlign: 'center', padding: '28px 0 20px' }}>
         <img
           src="assets/logo-logotipo.png"
@@ -796,6 +841,7 @@ const DocBody: React.FC<DocBodyProps> = ({ state }) => {
         <pre style={{ fontSize: 11, color: C.textFnt, lineHeight: 1.7, whiteSpace: 'pre-wrap', fontFamily: 'inherit', margin: 0 }}>
           {CONDITIONS}
         </pre>
+      </div>
       </div>
     </div>
   );
@@ -967,6 +1013,27 @@ NAWEMEDIA — Producción y Diseño Audiovisual`;
               Borrar firma
             </button>
           </div>
+          {/* Botones de descarga + pago + WhatsApp */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+            <button
+              onClick={() => descargarPresupuesto(state.cliente.nombre)}
+              style={{ ...btnSec({ padding: '12px 14px', fontSize: 12, borderColor: 'rgba(245,158,11,0.3)', color: C.acc }) }}
+            >
+              📥 Descargar
+            </button>
+            <button
+              onClick={() => abrirPagoMercadoPago(state)}
+              style={{ ...btnSec({ padding: '12px 14px', fontSize: 12, borderColor: 'rgba(245,158,11,0.3)', color: C.acc }) }}
+            >
+              💳 Pagar 50%
+            </button>
+          </div>
+          <button
+            onClick={() => window.open(generarWhatsAppLink(state), '_blank')}
+            style={{ ...btnSec({ width: '100%', padding: '12px', fontSize: 12, marginBottom: 12, borderColor: 'rgba(34,178,51,0.3)', color: '#22B233' }) }}
+          >
+            💬 Hablar por WhatsApp
+          </button>
           <button onClick={handleConfirm} style={{ ...btnPrim({ width: '100%', padding: '15px', fontSize: 14 }) }}>
             ✓ Confirmar y enviar presupuesto
           </button>
@@ -1040,6 +1107,27 @@ const SignedView: React.FC<SignedViewProps> = ({ state, signed }) => {
         </div>
       </div>
 
+      {/* BOTONES DE ACCIÓN FINAL */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+        <button
+          onClick={() => descargarPresupuesto(state.cliente.nombre)}
+          style={{ ...btnSec({ padding: '12px 14px', fontSize: 12, borderColor: 'rgba(245,158,11,0.3)', color: C.acc }) }}
+        >
+          📥 Descargar
+        </button>
+        <button
+          onClick={() => abrirPagoMercadoPago(state)}
+          style={{ ...btnSec({ padding: '12px 14px', fontSize: 12, borderColor: 'rgba(245,158,11,0.3)', color: C.acc }) }}
+        >
+          💳 Pagar 50%
+        </button>
+      </div>
+      <button
+        onClick={() => window.open(generarWhatsAppLink(state), '_blank')}
+        style={{ ...btnSec({ width: '100%', padding: '12px', fontSize: 12, marginBottom: 16, borderColor: 'rgba(34,178,51,0.3)', color: '#22B233' }) }}
+      >
+        💬 Hablar por WhatsApp
+      </button>
       <div style={{ fontSize: 11, color: C.textFnt, textAlign: 'center', lineHeight: 1.6 }}>
         Documento aceptado y firmado digitalmente.
         <br />
