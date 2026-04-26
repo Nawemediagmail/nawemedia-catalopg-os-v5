@@ -950,16 +950,15 @@ NAWEMEDIA — Producción y Diseño Audiovisual`;
 
   return (
     <div className="fade-in" style={{ paddingBottom: 40 }}>
-      {step === 'read' && (
-        <>
-          <DocBody state={state} />
-          <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px 20px' }}>
-            <button onClick={() => setStep('sign')} style={{ ...btnPrim({ width: '100%', padding: '15px', fontSize: 14 }) }}>
-              Continuar para firmar →
-            </button>
-          </div>
-        </>
-      )}
+      {/* DocBody siempre en el DOM pero oculto cuando step !== 'read' */}
+      <div style={{ display: step === 'read' ? 'block' : 'none' }}>
+        <DocBody state={state} />
+        <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px 20px' }}>
+          <button onClick={() => setStep('sign')} style={{ ...btnPrim({ width: '100%', padding: '15px', fontSize: 14 }) }}>
+            Continuar para firmar →
+          </button>
+        </div>
+      </div>
 
       {step === 'sign' && (
         <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 40px' }}>
@@ -1034,6 +1033,10 @@ const SignedView: React.FC<SignedViewProps> = ({ state, signed }) => {
 
   return (
     <div className="fade-in" style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 60px' }}>
+      {/* DocBody oculto para descargar */}
+      <div style={{ display: 'none' }}>
+        <DocBody state={state} />
+      </div>
       <div style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 20, padding: '20px', marginBottom: 20, textAlign: 'center' }}>
         <div style={{ fontSize: 36, marginBottom: 8 }}>✅</div>
         <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: C.green, letterSpacing: '0.08em' }}>Contrato Firmado</div>
