@@ -373,7 +373,6 @@ interface TopBarProps {
 const TopBar: React.FC<TopBarProps> = ({ view, setView, canGoPreview }) => {
   const steps = [
     { id: 0, lbl: 'Armar' },
-    { id: 1, lbl: 'Revisar' },
     { id: 2, lbl: 'Cliente' },
     { id: 3, lbl: 'Firmado' },
   ];
@@ -398,7 +397,7 @@ const TopBar: React.FC<TopBarProps> = ({ view, setView, canGoPreview }) => {
               key={s.id}
               onClick={() => {
                 if (s.id === 0) setView(0);
-                if (s.id === 1 && canGoPreview) setView(1);
+                if (s.id === 2 && canGoPreview) setView(2);
               }}
               style={{
                 background: view === s.id ? C.acc : 'transparent',
@@ -408,10 +407,10 @@ const TopBar: React.FC<TopBarProps> = ({ view, setView, canGoPreview }) => {
                 padding: '5px 10px',
                 fontSize: 11,
                 fontWeight: 700,
-                cursor: s.id <= 1 ? 'pointer' : 'default',
+                cursor: s.id === 0 || (s.id === 2 && canGoPreview) ? 'pointer' : 'default',
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                opacity: s.id > 1 && view < s.id ? 0.3 : 1,
+                opacity: s.id > 2 && view < s.id ? 0.3 : 1,
               }}
             >
               {s.lbl}
@@ -722,7 +721,7 @@ const BuilderView: React.FC<BuilderViewProps> = ({ state, setState, onPreview })
 
       {/* CTA */}
       <button
-        onClick={onPreview}
+        onClick={() => onPreview()}
         disabled={state.items.length === 0}
         style={{
           ...btnPrim({
@@ -735,7 +734,7 @@ const BuilderView: React.FC<BuilderViewProps> = ({ state, setState, onPreview })
           }),
         }}
       >
-        Ver cómo queda →
+        Continuar al cliente →
       </button>
     </div>
   );
@@ -846,27 +845,6 @@ const DocBody: React.FC<DocBodyProps> = ({ state }) => {
     </div>
   );
 };
-
-// ─── VIEW 1: PREVIEW ──────────────────────────────────────────────────────────
-interface PreviewViewProps {
-  state: BudgetState;
-  onEdit: () => void;
-  onSend: () => void;
-}
-
-const PreviewView: React.FC<PreviewViewProps> = ({ state, onEdit, onSend }) => (
-  <div className="fade-in" style={{ paddingBottom: 100 }}>
-    <DocBody state={state} />
-    <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px 20px', display: 'flex', gap: 10 }}>
-      <button onClick={onEdit} style={{ ...btnSec({ flex: '0 0 auto' }) }}>
-        ← Editar
-      </button>
-      <button onClick={onSend} style={{ ...btnPrim({ flex: 1, padding: '14px' }) }}>
-        Enviar al cliente →
-      </button>
-    </div>
-  </div>
-);
 
 // ─── VIEW 2: CLIENT (sign + email) ───────────────────────────────────────────
 interface ClientViewProps {
@@ -1167,8 +1145,7 @@ export default function Presupuesto() {
       <div style={{ position: 'fixed', inset: 0, backgroundImage: 'url(assets/bg-hero.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.07, zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'relative', zIndex: 1 }}>
       <TopBar view={view} setView={setView} canGoPreview={canGoPreview} />
-      {view === 0 && <BuilderView state={state} setState={setState} onPreview={() => setView(1)} />}
-      {view === 1 && <PreviewView state={state} onEdit={() => setView(0)} onSend={() => setView(2)} />}
+      {view === 0 && <BuilderView state={state} setState={setState} onPreview={() => setView(2)} />}
       {view === 2 && <ClientView state={state} onDone={(data) => { setSigned(data); setView(3); }} />}
       {view === 3 && signed && <SignedView state={state} signed={signed} />}
       </div>
