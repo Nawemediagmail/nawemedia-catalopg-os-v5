@@ -5,11 +5,11 @@ interface FlagProps { code: string; size?: number; }
 const Flag: React.FC<FlagProps> = ({ code, size = 16 }) => {
   const flags: Record<string, string> = {
     USD: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#B22234"/><g fill="#FFFFFF"><rect y="46.15" width="900" height="46.15"/><rect y="138.46" width="900" height="46.15"/><rect y="230.77" width="900" height="46.15"/><rect y="323.08" width="900" height="46.15"/><rect y="415.38" width="900" height="46.15"/></g><rect width="360" height="323.08" fill="#3C3B6B"/></svg>',
-    EUR: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#00209F"/><rect y="200" width="900" height="200" fill="#FFFFFF"/><rect y="200" width="900" height="200" fill="#FFD700" opacity="0.3"/></svg>',
-    BRL: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#009B3A"/><polygon points="450,200 700,300 450,400 200,300" fill="#FFCC00"/><rect x="200" y="250" width="500" height="100" fill="#002776"/></svg>',
+    EUR: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#003399"/><circle cx="450" cy="300" r="120" fill="none" stroke="#FFD700" stroke-width="30"/><circle cx="350" cy="250" r="15" fill="#FFD700"/><circle cx="420" cy="180" r="15" fill="#FFD700"/><circle cx="550" cy="180" r="15" fill="#FFD700"/><circle cx="600" cy="250" r="15" fill="#FFD700"/><circle cx="550" cy="370" r="15" fill="#FFD700"/><circle cx="420" cy="420" r="15" fill="#FFD700"/><circle cx="300" cy="370" r="15" fill="#FFD700"/></svg>',
+    BRL: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#009B3A"/><polygon points="450,150 750,300 450,450 150,300" fill="#FFCC00"/><rect x="300" y="280" width="300" height="40" fill="#002776"/><text x="450" y="320" text-anchor="middle" fill="#FFCC00" font-size="24" font-weight="bold" font-family="Arial">BRASIL</text></svg>',
     COP: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="200" fill="#FFCD00"/><rect y="200" width="900" height="200" fill="#0052CC"/><rect y="400" width="900" height="200" fill="#FF0000"/></svg>',
-    PEN: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="600" fill="#CE1126"/><rect x="300" width="300" height="600" fill="#FFFFFF"/><rect x="600" width="300" height="600" fill="#CE1126"/></svg>',
-    ARS: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="200" fill="#74B9FF"/><rect y="200" width="900" height="200" fill="#FFFFFF"/><rect y="400" width="900" height="200" fill="#EF3B39"/><circle cx="450" cy="300" r="50" fill="#FFD700"/></svg>',
+    PEN: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="600" fill="#CE1126"/><rect x="300" width="300" height="600" fill="#FFFFFF"/><rect x="600" width="300" height="600" fill="#CE1126"/><circle cx="450" cy="300" r="40" fill="#FFB81C"/></svg>',
+    ARS: '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="200" fill="#74ACDF"/><rect y="200" width="900" height="200" fill="#FFFFFF"/><rect y="400" width="900" height="200" fill="#EF3B39"/><circle cx="450" cy="300" r="50" fill="#FFD700"/><polygon points="450,250 460,280 490,280 470,300 480,330 450,310 420,330 430,300 410,280 440,280" fill="#FFD700"/></svg>',
   };
   const svg = flags[code] || '';
   return (
@@ -968,14 +968,20 @@ NAWEMEDIA — Producción y Diseño Audiovisual`;
   return (
     <div className="fade-in" style={{ paddingBottom: 40 }}>
       {/* DocBody siempre en el DOM pero oculto cuando step !== 'read' - visibility:hidden permite html2canvas capturarlo */}
-      <div style={{ position: step === 'read' ? 'relative' : 'absolute', top: step === 'read' ? 0 : -10000, left: -10000, width: '100%', pointerEvents: step === 'read' ? 'auto' : 'none' }}>
-        <DocBody state={state} />
-        <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px 20px' }}>
-          <button onClick={() => setStep('sign')} style={{ ...btnPrim({ width: '100%', padding: '15px', fontSize: 14 }) }}>
-            Continuar para firmar →
-          </button>
+      {step === 'read' ? (
+        <>
+          <DocBody state={state} />
+          <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px 20px' }}>
+            <button onClick={() => setStep('sign')} style={{ ...btnPrim({ width: '100%', padding: '15px', fontSize: 14 }) }}>
+              Continuar para firmar →
+            </button>
+          </div>
+        </>
+      ) : (
+        <div style={{ position: 'absolute', top: -10000, left: -10000, width: '100%', pointerEvents: 'none' }}>
+          <DocBody state={state} />
         </div>
-      </div>
+      )}
 
       {step === 'sign' && (
         <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 40px' }}>
