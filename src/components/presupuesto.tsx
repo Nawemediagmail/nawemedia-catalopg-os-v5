@@ -968,7 +968,7 @@ NAWEMEDIA — Producción y Diseño Audiovisual`;
   return (
     <div className="fade-in" style={{ paddingBottom: 40 }}>
       {/* DocBody siempre en el DOM pero oculto cuando step !== 'read' - visibility:hidden permite html2canvas capturarlo */}
-      <div style={{ visibility: step === 'read' ? 'visible' : 'hidden', height: step === 'read' ? 'auto' : 0, overflow: 'hidden' }}>
+      <div style={{ position: step === 'read' ? 'relative' : 'absolute', top: step === 'read' ? 0 : -10000, left: -10000, width: '100%', pointerEvents: step === 'read' ? 'auto' : 'none' }}>
         <DocBody state={state} />
         <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 16px 20px' }}>
           <button onClick={() => setStep('sign')} style={{ ...btnPrim({ width: '100%', padding: '15px', fontSize: 14 }) }}>
@@ -1051,7 +1051,7 @@ const SignedView: React.FC<SignedViewProps> = ({ state, signed }) => {
   return (
     <div className="fade-in" style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 60px' }}>
       {/* DocBody oculto para descargar */}
-      <div style={{ visibility: 'hidden', height: 0, overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', top: -10000, left: -10000, width: '100%' }}>
         <DocBody state={state} />
       </div>
       <div style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 20, padding: '20px', marginBottom: 20, textAlign: 'center' }}>
